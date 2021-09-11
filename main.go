@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha1"
-	"encoding/hex"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -179,7 +178,7 @@ func fetchLatestNucleiIgnoreFile() error {
 	if err != nil {
 		return err
 	}
-	currentHash := hex.EncodeToString(sha1.New().Sum(body))
+	currentHash := fmt.Sprintf("%x", sha1.New().Sum(body))
 
 	ignore := &config.IgnoreFile{}
 	if err := yaml.NewDecoder(bytes.NewReader(body)).Decode(ignore); err != nil {
