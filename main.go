@@ -36,6 +36,13 @@ var (
 func main() {
 	flag.Parse()
 
+	// Run the fetchers once on startup.
+	if err := fetchLatestVersionsFromGithub(); err != nil {
+		log.Printf("Could not fetch latest versions: %s\n", err)
+	}
+	if err := fetchLatestNucleiIgnoreFile(); err != nil {
+		log.Printf("Could not fetch latest ignore-file: %s\n", err)
+	}
 	quit := fetcherLoop()
 
 	// /versions -> return latest version for nuclei and templates repositories
@@ -72,7 +79,7 @@ func main() {
 }
 
 func fetcherLoop() chan struct{} {
-	ticker := time.NewTicker(5 * time.Second)
+	ticker := time.NewTicker(1 * time.Minute)
 	quit := make(chan struct{})
 
 	go func() {
