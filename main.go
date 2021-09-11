@@ -58,7 +58,7 @@ func main() {
 		_, _ = w.Write(ignoreData)
 	})
 
-	server := &http.Server{Addr: ":8080"}
+	server := &http.Server{Addr: "localhost:8080"}
 	server.Handler = http.DefaultServeMux
 	go server.ListenAndServe()
 
@@ -174,9 +174,18 @@ func fetchLatestNucleiIgnoreFile() error {
 	if err := yaml.NewDecoder(bytes.NewReader(body)).Decode(ignore); err != nil {
 		return err
 	}
+	upgraded := 0
+
 	ignoreMutex.Lock()
+	if len(nucleiIgnore) != len(body) {
+		upgraded = len(body) - len(nucleiIgnore)
+	}
 	nucleiIgnore = body
 	ignoreMutex.Unlock()
+
+	if upgraded > 0 {
+		log.Printf("Updated nuclei-ignore by %d bytes\n", upgraded)
+	}
 	return nil
 }
 
