@@ -3,6 +3,8 @@ package main
 import (
 	"bytes"
 	"context"
+	"crypto/sha1"
+	"encoding/hex"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -28,6 +30,7 @@ var (
 	versionsMutex         = &sync.RWMutex{}
 
 	nucleiIgnore []byte
+	ignoreHash   string
 	ignoreMutex  = &sync.RWMutex{}
 
 	githubToken = flag.String("gh-token", os.Getenv("GH_TOKEN"), "Github API Key")
@@ -176,23 +179,21 @@ func fetchLatestNucleiIgnoreFile() error {
 	if err != nil {
 		return err
 	}
+	currentHash := hex.EncodeToString(sha1.New().Sum(body))
 
 	ignore := &config.IgnoreFile{}
 	if err := yaml.NewDecoder(bytes.NewReader(body)).Decode(ignore); err != nil {
 		return err
 	}
-	upgraded := 0
 
 	ignoreMutex.Lock()
-	if len(nucleiIgnore) != len(body) {
-		upgraded = len(body) - len(nucleiIgnore)
+	if currentHash != ignoreHash {
+		// Replace
+		ignoreHash = currentHash
+		nucleiIgnore = body
+		log.Printf("Updated nuclei-ignore by %s version\n", currentHash)
 	}
-	nucleiIgnore = body
 	ignoreMutex.Unlock()
-
-	if upgraded > 0 {
-		log.Printf("Updated nuclei-ignore by %d bytes\n", upgraded)
-	}
 	return nil
 }
 
