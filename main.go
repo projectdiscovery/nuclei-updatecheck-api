@@ -185,14 +185,20 @@ func fetchLatestNucleiIgnoreFile() error {
 		return err
 	}
 
-	ignoreMutex.Lock()
-	if currentHash != ignoreHash {
-		// Replace
-		ignoreHash = currentHash
-		nucleiIgnore = body
-		log.Printf("Updated nuclei-ignore by %s version\n", currentHash)
+	ignoreMutex.RLock()
+	if currentHash == ignoreHash {
+		ignoreMutex.RUnlock()
+		return nil
 	}
+	ignoreMutex.RUnlock()
+
+	ignoreMutex.Lock()
+	// Replace
+	ignoreHash = currentHash
+	nucleiIgnore = body
 	ignoreMutex.Unlock()
+
+	log.Printf("Updated nuclei-ignore by %s version\n", currentHash)
 	return nil
 }
 
