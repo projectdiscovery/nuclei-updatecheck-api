@@ -2,10 +2,10 @@ package client
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"time"
 
 	jsoniter "github.com/json-iterator/go"
@@ -27,7 +27,7 @@ type LatestVersion struct {
 }
 
 func InitNucleiVersion(version string) {
-	nucleiVersion = fmt.Sprintf("Nuclei/%s", version)
+	nucleiVersion = version
 }
 
 // GetLatestNucleiTemplatesVersion returns the latest version info for nuclei and templates repos
@@ -70,7 +70,9 @@ func callRegisterServer(call string) (io.ReadCloser, error) {
 		return nil, errors.Wrap(err, "could not make request")
 	}
 	if nucleiVersion != "" {
-		req.Header.Set("Referer", nucleiVersion)
+		query := make(url.Values, 1)
+		query.Set("v", nucleiVersion)
+		req.URL.RawQuery = query.Encode()
 	}
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
