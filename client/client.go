@@ -70,7 +70,7 @@ func callRegisterServer(call string) (io.ReadCloser, error) {
 		return nil, errors.Wrap(err, "could not make request")
 	}
 	if nucleiVersion != "" {
-		req.Header.Set("User-Agent", nucleiVersion)
+		req.Header.Set("Referer", nucleiVersion)
 	}
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
