@@ -55,7 +55,7 @@ func GetLatestIgnoreFile() ([]byte, error) {
 
 // callRegisterServer makes a request to RegisterServer with a call.
 func callRegisterServer(call string) (io.ReadCloser, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, RegisterServer+call, nil)
