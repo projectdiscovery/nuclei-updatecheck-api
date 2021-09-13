@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -17,10 +18,16 @@ const (
 	IgnoreCall     = "ignore"
 )
 
+var nucleiVersion string
+
 // LatestVersion is the latest version info for nuclei and templates repos
 type LatestVersion struct {
 	Nuclei    string
 	Templates string
+}
+
+func InitNucleiVersion(version string) {
+	nucleiVersion = fmt.Sprintf("Nuclei/%s", version)
 }
 
 // GetLatestNucleiTemplatesVersion returns the latest version info for nuclei and templates repos
@@ -61,6 +68,9 @@ func callRegisterServer(call string) (io.ReadCloser, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, RegisterServer+call, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not make request")
+	}
+	if nucleiVersion != "" {
+		req.Header.Set("User-Agent", nucleiVersion)
 	}
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
