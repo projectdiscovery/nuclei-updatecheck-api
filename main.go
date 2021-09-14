@@ -56,6 +56,10 @@ func main() {
 		}
 		versionsMutex.RUnlock()
 
+		ignoreMutex.RLock()
+		data["ignore-hash"] = ignoreHash
+		ignoreMutex.RUnlock()
+
 		_ = jsoniter.NewEncoder(w).Encode(data)
 	})
 	// /ignore -> returns the nuclei-ignore file for use in template exclusion

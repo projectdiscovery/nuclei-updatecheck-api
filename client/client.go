@@ -22,8 +22,9 @@ var nucleiVersion string
 
 // LatestVersion is the latest version info for nuclei and templates repos
 type LatestVersion struct {
-	Nuclei    string
-	Templates string
+	Nuclei     string
+	Templates  string
+	IgnoreHash string
 }
 
 func InitNucleiVersion(version string) {
@@ -42,7 +43,7 @@ func GetLatestNucleiTemplatesVersion() (*LatestVersion, error) {
 	if err := jsoniter.NewDecoder(body).Decode(&data); err != nil {
 		return nil, err
 	}
-	return &LatestVersion{Nuclei: data["nuclei"], Templates: data["templates"]}, nil
+	return &LatestVersion{Nuclei: data["nuclei"], Templates: data["templates"], IgnoreHash: data["ignore-hash"]}, nil
 }
 
 // GetLatestIgnoreFile returns the latest version of nuclei ignore
