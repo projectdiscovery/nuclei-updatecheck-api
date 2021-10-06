@@ -182,9 +182,7 @@ func fetchLatestNucleiIgnoreFile() error {
 	if err != nil {
 		return err
 	}
-	hasher := md5.New()
-	hasher.Write(body)
-	currentHash := fmt.Sprintf("%x", md5.New().Sum(nil))
+	currentHash := fmt.Sprintf("%x", md5.Sum(body))
 
 	ignore := &config.IgnoreFile{}
 	if err := yaml.NewDecoder(bytes.NewReader(body)).Decode(ignore); err != nil {
